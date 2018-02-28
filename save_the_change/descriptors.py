@@ -36,25 +36,31 @@ class ChangeTrackingDescriptor(object):
 		# it'll change (normally) is through a call to our __set__, at which
 		# point the original value will end up in _changed_fields.
 		if not (
-			self.name in instance.__dict__['_mutability_checked'] or
-			self.name in instance.__dict__['_changed_fields'] or
-			self.name in instance.__dict__['_mutable_fields']
+			self.name in instance.__dict__.get('_mutability_checked', set()) or
+			self.name in instance.__dict__.get('_changed_fields', {}) or
+			self.name in instance.__dict__.get('_mutable_fields', {})
 		):
 			if is_mutable(value):
+				if '_mutable_fields' not in instance.__dict__:
+					instance.__dict__['_mutable_fields'] = {}
 				instance.__dict__['_mutable_fields'][self.name] = deepcopy(value)
-			
+			if '_mutability_checked' not in instance.__dict__:
+				instance.__dict__['_mutability_checked'] = set()
+
 			instance.__dict__['_mutability_checked'].add(self.name)
 		
 		return value
 	
 	def __set__(self, instance, value):
-		if self.name not in instance.__dict__['_mutable_fields']:
+		if self.name not in instance.__dict__.get('_mutable_fields', {}):
 			old_value = instance.__dict__.get(self.name, DoesNotExist)
 			
 			if old_value is DoesNotExist and self.django_descriptor and hasattr(self.django_descriptor, 'cache_name'):
 				old_value = instance.__dict__.get(self.django_descriptor.cache_name, DoesNotExist)
 			
 			if old_value is not DoesNotExist:
+				if '_changed_fields' not in instance.__dict__:
+					instance.__dict__['_changed_fields'] = {}
 				if instance.__dict__['_changed_fields'].get(self.name, DoesNotExist) == value:
 					instance.__dict__['_changed_fields'].pop(self.name, None)
 				

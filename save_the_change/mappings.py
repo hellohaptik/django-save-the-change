@@ -2,7 +2,7 @@
 
 from __future__ import division, absolute_import, print_function, unicode_literals
 
-from collections import Mapping
+from collections.abc import Mapping
 
 
 class OldValues(Mapping):

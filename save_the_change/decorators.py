@@ -4,7 +4,7 @@ from __future__ import division, absolute_import, print_function, unicode_litera
 
 from collections import defaultdict
 
-from django.utils import six
+import six
 
 from .util import DoesNotExist
 from .mappings import OldValues

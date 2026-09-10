@@ -6,7 +6,7 @@ from datetime import date, time, datetime, timedelta, tzinfo
 from decimal import Decimal
 from uuid import UUID
 
-from django.utils import six
+import six
 
 
 #: A :class:`set` listing known immutable types.
